@@ -24,4 +24,4 @@ const hue = {
 	})
 };
 
-export default hue;
+module.exports = hue;
