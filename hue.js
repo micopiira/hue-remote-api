@@ -64,17 +64,22 @@ const fetch = require('node-fetch');
  */
 
 const hue = (API_ROOT = 'https://api.meethue.com') => {
+
+	/**
+	 * @returns {Promise}
+	 */
+	const call = (path, opts) => fetch(API_ROOT + path, opts).then(res => res.json());
+
 	/**
 	 * @param {string} accessToken
 	 * @param {string} url
-	 * @returns {Promise<any>}
 	 */
-	const getJson = (accessToken, url) => fetch(API_ROOT + url, {
+	const getJson = (accessToken, url) => call(url, {
 		headers: {
 			'Authorization': 'Bearer ' + accessToken,
 			'Content-Type': 'application/json'
 		}
-	}).then(res => res.json());
+	});
 
 	return {
 		oauth2: {
@@ -139,7 +144,8 @@ const hue = (API_ROOT = 'https://api.meethue.com') => {
 				body: JSON.stringify(newState)
 			}).then(res => res.json())
 		}),
-		getJson
+		getJson,
+		call
 	};
 };
 
