@@ -1,5 +1,68 @@
 const fetch = require('node-fetch');
 
+/**
+ * @typedef {{state: {},
+ * config: {},
+ * capabilities: {},
+ * swupdate: {},
+ * name: String,
+ * type: String,
+ * modelid: String,
+ * manufacturername: String,
+ * swversion: String,
+ * uniqueid: String
+ * }} Sensor
+ */
+
+/**
+ * @typedef {{
+ * state: {
+ *   on: Boolean,
+ *   bri: Number,
+ *   hue: Number,
+ *   sat: Number,
+ *   xy: Number[],
+ *   ct: Number,
+ *   alert: String,
+ *   colormode: String,
+ *   mode: String,
+ *   reachable: Boolean
+ * },
+ * swupdate: {},
+ * type: String,
+ * name: String,
+ * modelid: String,
+ * manufacturername: String,
+ * productname: String,
+ * capabilities: {},
+ * config: {},
+ * uniqueid: String,
+ * swversion: String,
+ * swconfigid: String,
+ * productid: String
+ * }} Light
+ */
+
+/**
+ * @typedef {{
+ * 	on: Boolean,
+ *  bri: Number,
+ *  hue: Number,
+ *  sat: Number,
+ *  xy: Number[],
+ *  ct: Number,
+ *  alert: String,
+ *  effect: String,
+ *  transitiontime: Number,
+ *  bri_inc: Number,
+ *  sat_inc: Number,
+ *  hue_inc: Number,
+ *  ct_inc: Number,
+ *  xy_inc: Number
+ * }} NewLightState
+ * 
+ */
+
 const hue = (API_ROOT = 'https://api.meethue.com') => {
 	/**
 	 * @param {string} accessToken
@@ -45,16 +108,32 @@ const hue = (API_ROOT = 'https://api.meethue.com') => {
 			/**
 			 * @param {String} bridgeId
 			 * @param {String} username
+			 * @returns {Promise<{lights: Object.<string, Light>, groups: {}, config: {}, schedules:{}, scenes: {}, rules: {}, sensors: Object.<string, Sensor>, resourcelinks: {}}>}
 			 */
 			getBridgeInformation: (bridgeId, username) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}`),
 			/**
 			 * @param {String} bridgeId
 			 * @param {String} username
+			 * @returns {Promise<Object.<string, Sensor>>}
 			 */
-			getSensors: (bridgeId, username) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}/sensors`)
+			getSensors: (bridgeId, username) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}/sensors`),
+			/**
+			 * @param {String} bridgeId
+			 * @param {String} username
+			 * @returns {Promise<Object.<string, Light>>}
+			 */
+			getLights: (bridgeId, username) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}/lights`),
+			/**
+			 * @param {String} bridgeId
+			 * @param {String} username
+			 * @param {String} lightId
+			 * @param {NewLightState} newState
+			 */
+			setLightState: (bridgeId, username, lightId, newState) => {}
 		}),
 		getJson
 	};
 };
 
 module.exports = hue;
+
