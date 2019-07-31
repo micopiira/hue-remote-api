@@ -58,7 +58,7 @@ const fetch = require('node-fetch');
  *  sat_inc: Number,
  *  hue_inc: Number,
  *  ct_inc: Number,
- *  xy_inc: Number
+ *  xy_inc: Number[]
  * }} NewLightState
  * 
  */
@@ -128,8 +128,16 @@ const hue = (API_ROOT = 'https://api.meethue.com') => {
 			 * @param {String} username
 			 * @param {String} lightId
 			 * @param {NewLightState} newState
+			 * @returns {Promise}
 			 */
-			setLightState: (bridgeId, username, lightId, newState) => {}
+			setLightState: (bridgeId, username, lightId, newState) => fetch(API_ROOT + `/v2/bridges/${bridgeId}/${username}/lights/${lightId}/state`, {
+				method: 'PUT',
+				headers: {
+					'Authorization': 'Bearer ' + accessToken,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(newState)
+			}).then(res => res.json())
 		}),
 		getJson
 	};
