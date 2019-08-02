@@ -110,13 +110,13 @@ const hue = (API_ROOT = 'https://api.meethue.com', remote = true) => {
 			/**
 			 * @returns {Promise<{id: String, internalipaddress: String}[]>}
 			 */
-			getBridges: () => getJson({accessToken}, '/v2/bridges'),
+			getBridges: () => call('/v2/bridges', {headers: getHeaders(accessToken)}),
 			/**
 			 * @param {String} bridgeId
 			 * @param {String} username
 			 * @returns {Promise<{lights: Object.<string, Light>, groups: {}, config: {}, schedules:{}, scenes: {}, rules: {}, sensors: Object.<string, Sensor>, resourcelinks: {}}>}
 			 */
-			getBridgeInformation: ({bridgeId, username}) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}`),
+			getBridgeInformation: ({bridgeId, username}) => call(`/v2/bridges/${bridgeId}/${username}`, {headers: getHeaders(accessToken)}),
 
 		}),
 		api: ({accessToken, bridgeId, username}) => ({
