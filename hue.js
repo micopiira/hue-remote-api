@@ -70,15 +70,16 @@ const hue = (API_ROOT = 'https://api.meethue.com', remote = true) => {
 		'Content-Type': 'application/json'
 	});
 
-	const urlPrefix = (username, bridgeId) => remote ? `${API_ROOT}/v2/bridges/${bridgeId}/${username}` : `${API_ROOT}/api/${username}`;
+	const urlPrefix = (username, bridgeId) => remote ? `/v2/bridges/${bridgeId}/${username}` : `/api/${username}`;
 
 	/**
 	 * @returns {Promise}
 	 */
-	const call = ({username, bridgeId, path}, opts) => fetch(urlPrefix(username, bridgeId) + path, opts).then(res => res.json());
+	const call = (path, opts) => fetch(API_ROOT + path, opts).then(res => res.json());
 
-	const getJson = ({accessToken, path, bridgeId, username}) => call({path, bridgeId, username}, {
-		headers: getHeaders(accessToken)
+	const getJson = ({accessToken, path, bridgeId, username}, opts) => call(urlPrefix(username, bridgeId) + path, {
+		headers: getHeaders(accessToken),
+		...opts
 	});
 
 	return {
@@ -131,11 +132,10 @@ const hue = (API_ROOT = 'https://api.meethue.com', remote = true) => {
 			 * @param {NewLightState} newState
 			 * @returns {Promise}
 			 */
-			setLightState: ({lightId, newState}) => call({username, bridgeId, path: `/lights/${lightId}/state`}, {
+			setLightState: ({lightId, newState}) => getJson({accessToken, bridgeId, username, path: `/lights/${lightId}/state`}, {
 				method: 'PUT',
-				headers: getHeaders(accessToken),
 				body: JSON.stringify(newState)
-			}).then(res => res.json())
+			})
 		}),
 		getJson,
 		call
