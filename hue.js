@@ -63,22 +63,22 @@ const fetch = require('node-fetch');
  * 
  */
 
-const hue = (API_ROOT = 'https://api.meethue.com') => {
+const hue = (API_ROOT = 'https://api.meethue.com', remote = true) => {
+
+	const getHeaders = accessToken => ({
+		'Authorization': 'Bearer ' + accessToken,
+		'Content-Type': 'application/json'
+	});
+
+	const urlPrefix = (username, bridgeId) => remote ? `${API_ROOT}/v2/bridges/${bridgeId}/${username}` : `${API_ROOT}/api/${username}`;
 
 	/**
 	 * @returns {Promise}
 	 */
-	const call = (path, opts) => fetch(API_ROOT + path, opts).then(res => res.json());
+	const call = ({username, bridgeId, path}, opts) => fetch(urlPrefix(username, bridgeId) + path, opts).then(res => res.json());
 
-	/**
-	 * @param {string} accessToken
-	 * @param {string} url
-	 */
-	const getJson = (accessToken, url) => call(url, {
-		headers: {
-			'Authorization': 'Bearer ' + accessToken,
-			'Content-Type': 'application/json'
-		}
+	const getJson = ({accessToken, path, bridgeId, username}) => call({path, bridgeId, username}, {
+		headers: getHeaders(accessToken)
 	});
 
 	return {
@@ -109,38 +109,31 @@ const hue = (API_ROOT = 'https://api.meethue.com') => {
 			/**
 			 * @returns {Promise<{id: String, internalipaddress: String}[]>}
 			 */
-			getBridges: () => getJson(accessToken, '/v2/bridges'),
+			getBridges: () => getJson({accessToken}, '/v2/bridges'),
 			/**
 			 * @param {String} bridgeId
 			 * @param {String} username
 			 * @returns {Promise<{lights: Object.<string, Light>, groups: {}, config: {}, schedules:{}, scenes: {}, rules: {}, sensors: Object.<string, Sensor>, resourcelinks: {}}>}
 			 */
-			getBridgeInformation: (bridgeId, username) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}`),
+			getBridgeInformation: ({bridgeId, username}) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}`),
+
+		}),
+		api: ({accessToken, bridgeId, username}) => ({
 			/**
-			 * @param {String} bridgeId
-			 * @param {String} username
 			 * @returns {Promise<Object.<string, Sensor>>}
 			 */
-			getSensors: (bridgeId, username) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}/sensors`),
+			getSensors: () => getJson({accessToken, bridgeId, username, path: '/sensors'}),
 			/**
-			 * @param {String} bridgeId
-			 * @param {String} username
 			 * @returns {Promise<Object.<string, Light>>}
 			 */
-			getLights: (bridgeId, username) => getJson(accessToken, `/v2/bridges/${bridgeId}/${username}/lights`),
+			getLights: () => getJson({accessToken, bridgeId, username, path: '/lights'}),
 			/**
-			 * @param {String} bridgeId
-			 * @param {String} username
-			 * @param {String} lightId
 			 * @param {NewLightState} newState
 			 * @returns {Promise}
 			 */
-			setLightState: (bridgeId, username, lightId, newState) => fetch(API_ROOT + `/v2/bridges/${bridgeId}/${username}/lights/${lightId}/state`, {
+			setLightState: ({lightId, newState}) => call({username, bridgeId, path: `/lights/${lightId}/state`}, {
 				method: 'PUT',
-				headers: {
-					'Authorization': 'Bearer ' + accessToken,
-					'Content-Type': 'application/json'
-				},
+				headers: getHeaders(accessToken),
 				body: JSON.stringify(newState)
 			}).then(res => res.json())
 		}),
