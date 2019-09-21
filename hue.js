@@ -83,6 +83,16 @@ const hue = (API_ROOT = 'https://api.meethue.com', remote = true) => {
 	});
 
 	return {
+		bridgeDiscovery: {
+			/**
+			 * Depending on the firmware release of the Hue bridge the amount of information per Hue bridge can be different, e.g. the second Hue bridge in the reply above, it does not contain the “macaddress” and “name” items. 
+			 * In case of an empty JSON array reply (i.e. [ ]), no Hue bridge has been found. This can be because the user never connected the bridge to the Internet or it has been considered to be disconnected, in that case an option is to perform an “IP scan”, or ask the user to enter an IP address of the Hue bridge.
+			 * Best practice is to wait a maximum of 8 seconds for receiving the N-UPnP repsonse back from the Hue portal before continuing.
+			 * 
+			 * @returns {Promise<{id: String, internalipaddress: String, macaddress: String, name: String}[]>}
+			 */
+			nupnpScan: () => fetch('https://discovery.meethue.com/').then(res => res.json())
+		},
 		oauth2: {
 			/**
 			 * @param {String} clientId
