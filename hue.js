@@ -65,10 +65,10 @@ const fetch = require('node-fetch');
 
 const hue = (API_ROOT = 'https://api.meethue.com', remote = true) => {
 
-	const getHeaders = accessToken => ({
+	const getHeaders = accessToken => (remote ? {
 		'Authorization': 'Bearer ' + accessToken,
 		'Content-Type': 'application/json'
-	});
+	} : {'Content-Type': 'application/json'});
 
 	const urlPrefix = (username, bridgeId) => remote ? `/v2/bridges/${bridgeId}/${username}` : `/api/${username}`;
 
