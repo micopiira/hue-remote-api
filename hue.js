@@ -130,19 +130,26 @@ const hue = (API_ROOT = 'https://api.meethue.com', remote = true) => {
 
 		}),
 		api: ({accessToken, bridgeId, username}) => ({
+			request: (path, opts) => getJson({accessToken, bridgeId, username, path}, opts),
 			/**
 			 * @returns {Promise<Object.<string, Sensor>>}
 			 */
-			getSensors: () => getJson({accessToken, bridgeId, username, path: '/sensors'}),
+			getSensors: () => this.request('/sensors'),
 			/**
 			 * @returns {Promise<Object.<string, Light>>}
 			 */
-			getLights: () => getJson({accessToken, bridgeId, username, path: '/lights'}),
+			getLights: () => this.request('/lights'),
+			getGroups: () => this.request('/groups'),
+			getSchedules: () => this.request('/schedules'),
+			getScenes: () => this.request('/scenes'),
+			getRules: () => this.request('/rules'),
+			getResourcelinks: () => this.request('/resourcelinks'),
+			getCapabilities: () => this.request('/capabilities'),
 			/**
 			 * @param {NewLightState} newState
 			 * @returns {Promise}
 			 */
-			setLightState: ({lightId, newState}) => getJson({accessToken, bridgeId, username, path: `/lights/${lightId}/state`}, {
+			setLightState: ({lightId, newState}) => this.request(`/lights/${lightId}/state`, {
 				method: 'PUT',
 				body: JSON.stringify(newState)
 			})
